@@ -11,8 +11,10 @@ guest microVM (Ubuntu 22.04 e Debian 13) rodando em paralelo.
   `stop-vm.sh`, `vm-config-ubuntu.json`, `vm-config-debian.json`).
 - Deploy real roda a partir de `/data/firecracker` no host `taquion`
   (kernel, rootfs, sockets, pids, logs — fora do home, não versionado).
-- Acesso root nos guests usa a chave pessoal existente `~/.ssh/pessoal_ec1`
+- Acesso aos guests usa a chave pessoal existente `~/.ssh/pessoal_ec1`
   (mesma chave nos dois perfis) — não gerar chave nova por rootfs.
+- Todo guest tem usuário `cferreira` (grupo `sudo`) além do root, com a
+  mesma chave.
 
 ## Pré-requisitos
 
@@ -74,6 +76,13 @@ sudo cp ~/.ssh/pessoal_ec1.pub rootfs/squashfs-root/root/.ssh/authorized_keys
 sudo chmod 700 rootfs/squashfs-root/root/.ssh
 sudo chmod 600 rootfs/squashfs-root/root/.ssh/authorized_keys
 
+sudo chroot rootfs/squashfs-root useradd -m -s /bin/bash -G sudo cferreira
+sudo mkdir -p rootfs/squashfs-root/home/cferreira/.ssh
+sudo cp ~/.ssh/pessoal_ec1.pub rootfs/squashfs-root/home/cferreira/.ssh/authorized_keys
+sudo chroot rootfs/squashfs-root chown -R cferreira:cferreira /home/cferreira/.ssh
+sudo chmod 700 rootfs/squashfs-root/home/cferreira/.ssh
+sudo chmod 600 rootfs/squashfs-root/home/cferreira/.ssh/authorized_keys
+
 sudo chown -R root:root rootfs/squashfs-root
 truncate -s 1G rootfs/ubuntu.ext4
 sudo mkfs.ext4 -d rootfs/squashfs-root -F rootfs/ubuntu.ext4
@@ -93,7 +102,7 @@ mkdir -p /tmp/debian13-mnt
 sudo mount rootfs-debian/debian13.ext4 /tmp/debian13-mnt
 
 sudo debootstrap --arch=amd64 \
-  --include=openssh-server,systemd-sysv,iproute2,udev \
+  --include=openssh-server,systemd-sysv,iproute2,udev,sudo \
   trixie /tmp/debian13-mnt http://deb.debian.org/debian
 
 sudo mkdir -p /tmp/debian13-mnt/root/.ssh
@@ -101,6 +110,13 @@ sudo cp ~/.ssh/pessoal_ec1.pub /tmp/debian13-mnt/root/.ssh/authorized_keys
 sudo chmod 700 /tmp/debian13-mnt/root/.ssh
 sudo chmod 600 /tmp/debian13-mnt/root/.ssh/authorized_keys
 sudo chroot /tmp/debian13-mnt sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+sudo chroot /tmp/debian13-mnt useradd -m -s /bin/bash -G sudo cferreira
+sudo mkdir -p /tmp/debian13-mnt/home/cferreira/.ssh
+sudo cp ~/.ssh/pessoal_ec1.pub /tmp/debian13-mnt/home/cferreira/.ssh/authorized_keys
+sudo chroot /tmp/debian13-mnt chown -R cferreira:cferreira /home/cferreira/.ssh
+sudo chmod 700 /tmp/debian13-mnt/home/cferreira/.ssh
+sudo chmod 600 /tmp/debian13-mnt/home/cferreira/.ssh/authorized_keys
 
 sudo tee /tmp/debian13-mnt/etc/network/interfaces > /dev/null <<'EOF'
 auto eth0
