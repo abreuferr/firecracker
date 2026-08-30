@@ -33,7 +33,7 @@ esac
 
 MASK_SHORT="/30"
 
-sudo -v
+sudo -v 2>/dev/null || true
 
 if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
   echo "microVM '${PROFILE}' já está rodando (PID $(cat "$PIDFILE")). Rode stop-vm.sh ${PROFILE} primeiro."
