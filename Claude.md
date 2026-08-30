@@ -3,6 +3,27 @@
 Ver README.md para setup, estrutura e como rodar as microVMs. Aqui só o que
 não é óbvio a partir do README/código.
 
+Este arquivo é a memória viva do projeto — decisões e histórico relevante
+ficam aqui, versionados no repo, em vez de memória externa da sessão.
+
+## Acesso SSH e hardening
+
+- Chave `~/.ssh/pessoal_ec1` (mesma nos dois perfis) — não gerar chave nova
+  por rootfs. Todo guest tem `root` e `cferreira` (grupo `sudo`), ambos com
+  essa chave. Regra global (qualquer VM), registrada em `~/.claude/CLAUDE.md`.
+- `root` e `cferreira` são criados **sem senha** (`useradd -m` sem `passwd`)
+  — login só funciona por chave, mesmo com `PermitRootLogin yes` no
+  sshd_config, porque não existe senha pra autenticar. Isso equivale na
+  prática a `PermitRootLogin prohibit-password`, mas não está escrito
+  assim explicitamente — trocar se quiser hardening mais explícito.
+- `chmod 700` em `.ssh` e `chmod 600` em `authorized_keys`, pra root e pra
+  cferreira — sshd recusa login por chave se as permissões forem mais
+  abertas.
+- Rootfs existentes antes dessa convenção (ex.: builds anteriores a
+  2026-08-30) não têm `cferreira` retroativamente — só vale a partir da
+  reconstrução do zero. Rootfs debian já reconstruído com essas etapas em
+  2026-08-30.
+
 ## Gotchas confirmados
 
 - **Bucket de CI (`spec.ccfc.min.s3.amazonaws.com`)**: prefixos de versão
