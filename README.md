@@ -148,6 +148,13 @@ ssh -i ~/.ssh/pessoal_ec1 root@172.16.0.2
 ./stop-vm.sh ubuntu      # ou: ./stop-vm.sh debian
 ```
 
+`ssh -i ~/.ssh/pessoal_ec1 cferreira@172.16.0.2` também funciona, mas só em
+rootfs reconstruído com os passos das seções 3/4 acima (que criam o usuário).
+Nos rootfs que já existiam antes dessa convenção, só `root` tem a chave —
+`cferreira` precisa ser criado manualmente na VM já ligada (`useradd -m -G
+sudo cferreira` + chave em `~cferreira/.ssh/authorized_keys`) ou o rootfs
+precisa ser reconstruído do zero.
+
 Configurar rede/DNS na primeira sessão do guest, se necessário:
 
 ```bash
