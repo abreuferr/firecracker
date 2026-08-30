@@ -24,6 +24,21 @@ ficam aqui, versionados no repo, em vez de memória externa da sessão.
   reconstrução do zero. Rootfs debian já reconstruído com essas etapas em
   2026-08-30.
 
+## Padrão de estrutura (src/, doc/, README.md, CLAUDE.md)
+
+Regra global registrada em `~/.claude/CLAUDE.md`: todo projeto novo tem
+`src/`, `doc/`, `README.md` e `CLAUDE.md` na raiz. Aplicada retroativamente
+(2026-08-30) em `pessoal/risc-v` (faltavam README.md e CLAUDE.md) e
+`pessoal/etc` (faltava CLAUDE.md). Deixados de fora, de propósito:
+`pessoal/homelab` (já tem README/CLAUDE.md próprios, organizado por
+subpasta temática) e os multi-tópico `criptografia/`, `hsm/`, `lpic/`,
+`python/` (cada subpasta é um tema/curso — forçar `src/doc` destruiria
+essa organização). `projects/segura/*` não foi tocado.
+
+Este próprio repo não tem mais `doc/` (o guia tutorial que morava lá foi
+convertido em README.md/CLAUDE.md em 2026-08-30) — não é uma violação da
+regra, só não há conteúdo de doc separado do README no momento.
+
 ## Gotchas confirmados
 
 - **Bucket de CI (`spec.ccfc.min.s3.amazonaws.com`)**: prefixos de versão
