@@ -11,6 +11,8 @@ guest microVM (Ubuntu 22.04 e Debian 13) rodando em paralelo.
   `stop-vm.sh`, `vm-config-ubuntu.json`, `vm-config-debian.json`).
 - Deploy real roda a partir de `/data/firecracker` no host `taquion`
   (kernel, rootfs, sockets, pids, logs — fora do home, não versionado).
+- Acesso root nos guests usa a chave pessoal existente `~/.ssh/pessoal_ec1`
+  (mesma chave nos dois perfis) — não gerar chave nova por rootfs.
 
 ## Pré-requisitos
 
@@ -67,9 +69,8 @@ curl -fsSL "http://spec.ccfc.min.s3.amazonaws.com/firecracker-ci/v1.10/x86_64/ub
 sudo apt install -y squashfs-tools
 unsquashfs -d rootfs/squashfs-root rootfs/ubuntu.squashfs
 
-ssh-keygen -f rootfs/ubuntu.id_rsa -N ""
 sudo mkdir -p rootfs/squashfs-root/root/.ssh
-sudo cp rootfs/ubuntu.id_rsa.pub rootfs/squashfs-root/root/.ssh/authorized_keys
+sudo cp ~/.ssh/pessoal_ec1.pub rootfs/squashfs-root/root/.ssh/authorized_keys
 sudo chmod 700 rootfs/squashfs-root/root/.ssh
 sudo chmod 600 rootfs/squashfs-root/root/.ssh/authorized_keys
 
@@ -95,9 +96,8 @@ sudo debootstrap --arch=amd64 \
   --include=openssh-server,systemd-sysv,iproute2,udev \
   trixie /tmp/debian13-mnt http://deb.debian.org/debian
 
-ssh-keygen -f rootfs-debian/debian13.id_rsa -N ""
 sudo mkdir -p /tmp/debian13-mnt/root/.ssh
-sudo cp rootfs-debian/debian13.id_rsa.pub /tmp/debian13-mnt/root/.ssh/authorized_keys
+sudo cp ~/.ssh/pessoal_ec1.pub /tmp/debian13-mnt/root/.ssh/authorized_keys
 sudo chmod 700 /tmp/debian13-mnt/root/.ssh
 sudo chmod 600 /tmp/debian13-mnt/root/.ssh/authorized_keys
 sudo chroot /tmp/debian13-mnt sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -128,7 +128,7 @@ Os dois perfis rodam em paralelo, cada um com TAP/sub-rede/socket próprios:
 ```bash
 cd /data/firecracker
 ./start-vm.sh ubuntu     # ou: ./start-vm.sh debian
-ssh -i rootfs/ubuntu.id_rsa root@172.16.0.2
+ssh -i ~/.ssh/pessoal_ec1 root@172.16.0.2
 ./stop-vm.sh ubuntu      # ou: ./stop-vm.sh debian
 ```
 
