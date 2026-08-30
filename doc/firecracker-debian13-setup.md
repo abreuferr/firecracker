@@ -37,7 +37,9 @@ groups $USER
 ## 3. Baixar o binário do Firecracker
 
 ```bash
-mkdir -p ~/project/firecracker && cd ~/project/firecracker
+sudo mkdir -p /data/firecracker
+sudo chown "$(id -u):$(id -g)" /data/firecracker
+cd /data/firecracker
 
 ARCH="$(uname -m)"
 release_url="https://github.com/firecracker-microvm/firecracker/releases"
@@ -69,7 +71,7 @@ No nosso caso, a versão instalada era v1.16.1, mas o bucket de CI só tinha at�
 `v1.15`. Usamos essa versão manualmente:
 
 ```bash
-cd ~/project/firecracker
+cd /data/firecracker
 mkdir -p vmlinux rootfs
 
 ARCH="$(uname -m)"
@@ -140,7 +142,7 @@ O caminho é montar manualmente com `debootstrap`, reaproveitando o mesmo kernel
 
 ```bash
 sudo apt install -y debootstrap
-cd ~/project/firecracker
+cd /data/firecracker
 mkdir -p rootfs-debian
 
 truncate -s 1G rootfs-debian/debian13.ext4
@@ -201,13 +203,13 @@ poder rodar as duas microVMs **simultaneamente** sem conflito.
 ```json
 {
   "boot-source": {
-    "kernel_image_path": "/home/cferreira/project/firecracker/vmlinux/vmlinux.bin",
+    "kernel_image_path": "/data/firecracker/vmlinux/vmlinux.bin",
     "boot_args": "console=ttyS0 reboot=k panic=1"
   },
   "drives": [
     {
       "drive_id": "rootfs",
-      "path_on_host": "/home/cferreira/project/firecracker/rootfs/ubuntu.ext4",
+      "path_on_host": "/data/firecracker/rootfs/ubuntu.ext4",
       "is_root_device": true,
       "is_read_only": false
     }
@@ -231,13 +233,13 @@ poder rodar as duas microVMs **simultaneamente** sem conflito.
 ```json
 {
   "boot-source": {
-    "kernel_image_path": "/home/cferreira/project/firecracker/vmlinux/vmlinux.bin",
+    "kernel_image_path": "/data/firecracker/vmlinux/vmlinux.bin",
     "boot_args": "console=ttyS0 reboot=k panic=1"
   },
   "drives": [
     {
       "drive_id": "rootfs",
-      "path_on_host": "/home/cferreira/project/firecracker/rootfs-debian/debian13.ext4",
+      "path_on_host": "/data/firecracker/rootfs-debian/debian13.ext4",
       "is_root_device": true,
       "is_read_only": false
     }
@@ -266,7 +268,7 @@ Ambos os scripts aceitam um argumento de perfil: `ubuntu` (padrão) ou `debian`.
 #!/bin/bash
 set -euo pipefail
 
-FC_DIR="/home/cferreira/project/firecracker"
+FC_DIR="/data/firecracker"
 PROFILE="${1:-ubuntu}"
 
 case "$PROFILE" in
@@ -351,7 +353,7 @@ echo "    Logs:  tail -f $LOGFILE"
 #!/bin/bash
 set -uo pipefail
 
-FC_DIR="/home/cferreira/project/firecracker"
+FC_DIR="/data/firecracker"
 PROFILE="${1:-ubuntu}"
 
 case "$PROFILE" in
@@ -396,7 +398,7 @@ echo "==> [${PROFILE}] microVM parada e ambiente limpo."
 ### 8.3 Permissões e uso
 
 ```bash
-chmod +x ~/project/firecracker/start-vm.sh ~/project/firecracker/stop-vm.sh
+chmod +x /data/firecracker/start-vm.sh /data/firecracker/stop-vm.sh
 
 ./start-vm.sh ubuntu     # ou: ./start-vm.sh debian
 ./stop-vm.sh ubuntu      # ou: ./stop-vm.sh debian

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-FC_DIR="/home/cferreira/project/firecracker"
+FC_DIR="/data/firecracker"
 PROFILE="${1:-ubuntu}"
 
 case "$PROFILE" in
