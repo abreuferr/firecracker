@@ -25,8 +25,18 @@ case "$PROFILE" in
     GUEST_IP="172.16.1.2"
     SSH_KEY="${FC_DIR}/rootfs-debian/debian13.id_rsa"
     ;;
+  firefox)
+    CONFIG_FILE="${FC_DIR}/vm-config-firefox.json"
+    API_SOCKET="/tmp/firecracker-firefox.socket"
+    PIDFILE="${FC_DIR}/firecracker-firefox.pid"
+    LOGFILE="${FC_DIR}/firecracker-firefox.log"
+    TAP_DEV="tap2"
+    TAP_IP="172.16.2.1"
+    GUEST_IP="172.16.2.2"
+    SSH_KEY="${FC_DIR}/rootfs-firefox/firefox.id_rsa"
+    ;;
   *)
-    echo "Uso: $0 [ubuntu|debian]"
+    echo "Uso: $0 [ubuntu|debian|firefox]"
     exit 1
     ;;
 esac

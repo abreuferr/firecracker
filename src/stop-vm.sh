@@ -15,8 +15,13 @@ case "$PROFILE" in
     PIDFILE="${FC_DIR}/firecracker-debian.pid"
     TAP_DEV="tap1"
     ;;
+  firefox)
+    API_SOCKET="/tmp/firecracker-firefox.socket"
+    PIDFILE="${FC_DIR}/firecracker-firefox.pid"
+    TAP_DEV="tap2"
+    ;;
   *)
-    echo "Uso: $0 [ubuntu|debian]"
+    echo "Uso: $0 [ubuntu|debian|firefox]"
     exit 1
     ;;
 esac

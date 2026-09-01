@@ -39,6 +39,17 @@ Este próprio repo não tem mais `doc/` (o guia tutorial que morava lá foi
 convertido em README.md/CLAUDE.md em 2026-08-30) — não é uma violação da
 regra, só não há conteúdo de doc separado do README no momento.
 
+## Perfil `firefox` (2026-09-01)
+
+Clonado do rootfs `debian13.ext4` (mesma chave/usuários, sem regenerar nada).
+Terceiro perfil, sub-rede própria (`tap2`, `172.16.2.x/30`) — os três rodam
+em paralelo sem conflito. Objetivo: rodar Firefox no guest e exportar a
+janela pra estação de trabalho local (o próprio `taquion`) via X11
+forwarding sobre SSH. `X11Forwarding yes` já vinha habilitado por padrão no
+`sshd_config` do Debian — só faltou instalar `xauth` no guest. Testado de
+ponta a ponta (`ssh -X ... firefox-esr`, janela renderizada via XWayland do
+Sway do host) — funciona sem precisar de VNC.
+
 ## Gotchas confirmados
 
 - **Bucket de CI (`spec.ccfc.min.s3.amazonaws.com`)**: prefixos de versão
@@ -56,3 +67,11 @@ regra, só não há conteúdo de doc separado do README no momento.
   isso `start-vm.sh` trata essa chamada como non-fatal (`|| true`).
 - **Produção**: usar `jailer` em vez de invocar `firecracker` direto (chroot,
   cgroups, seccomp, namespace de rede dedicado) — não implementado neste lab.
+- **Rootfs de 1G é insuficiente para pacotes com GUI**: `firefox-esr` +
+  dependências (libavcodec, mesa/GL, LLVM) passam de 900M só de pacotes,
+  sem contar cache do apt — dá "No space left on device" a meio da
+  instalação e pode deixar o dpkg em estado inconsistente
+  (`dpkg --configure -a` / `apt-get install -f` resolve). Precisa parar a
+  VM, `truncate -s <novo-tamanho>` no `.ext4`, `e2fsck -fy` +
+  `resize2fs` (fsck antes **e** depois), e só então subir a VM de novo.
+  O perfil `firefox` usa 6G por esse motivo.

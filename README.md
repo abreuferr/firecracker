@@ -134,18 +134,28 @@ sudo umount /tmp/debian13-mnt
 
 Os dois perfis rodam em paralelo, cada um com TAP/sub-rede/socket próprios:
 
-| | Ubuntu 22.04 | Debian 13 (trixie) |
-|---|---|---|
-| TAP | `tap0` | `tap1` |
-| Sub-rede | `172.16.0.x/30` | `172.16.1.x/30` |
-| Socket API | `/tmp/firecracker-ubuntu.socket` | `/tmp/firecracker-debian.socket` |
-| Rootfs | `rootfs/ubuntu.ext4` | `rootfs-debian/debian13.ext4` |
+| | Ubuntu 22.04 | Debian 13 (trixie) | Firefox (Debian 13 + GUI) |
+|---|---|---|---|
+| TAP | `tap0` | `tap1` | `tap2` |
+| Sub-rede | `172.16.0.x/30` | `172.16.1.x/30` | `172.16.2.x/30` |
+| Socket API | `/tmp/firecracker-ubuntu.socket` | `/tmp/firecracker-debian.socket` | `/tmp/firecracker-firefox.socket` |
+| Rootfs | `rootfs/ubuntu.ext4` | `rootfs-debian/debian13.ext4` | `rootfs-firefox/firefox.ext4` (6G) |
 
 ```bash
 cd /data/firecracker
-./start-vm.sh ubuntu     # ou: ./start-vm.sh debian
+./start-vm.sh ubuntu     # ou: ./start-vm.sh debian / ./start-vm.sh firefox
 ssh -i ~/.ssh/pessoal_ec1 root@172.16.0.2
-./stop-vm.sh ubuntu      # ou: ./stop-vm.sh debian
+./stop-vm.sh ubuntu      # ou: ./stop-vm.sh debian / ./stop-vm.sh firefox
+```
+
+### Perfil `firefox`
+
+Clone do rootfs Debian 13, com `firefox-esr` instalado e exportado para a
+estação de trabalho local (o próprio host `taquion`) via X11 forwarding sobre
+SSH — o compositor Wayland (Sway) roda XWayland, então funciona sem VNC:
+
+```bash
+ssh -X -i ~/.ssh/pessoal_ec1 cferreira@172.16.2.2 firefox-esr
 ```
 
 `ssh -i ~/.ssh/pessoal_ec1 cferreira@172.16.0.2` também funciona, mas só em
