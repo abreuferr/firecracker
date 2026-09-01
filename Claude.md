@@ -48,7 +48,11 @@ janela pra estação de trabalho local (o próprio `taquion`) via X11
 forwarding sobre SSH. `X11Forwarding yes` já vinha habilitado por padrão no
 `sshd_config` do Debian — só faltou instalar `xauth` no guest. Testado de
 ponta a ponta (`ssh -X ... firefox-esr`, janela renderizada via XWayland do
-Sway do host) — funciona sem precisar de VNC.
+Sway do host) — funciona sem precisar de VNC. Precisou subir `mem_size_mib`
+de 512 (padrão dos outros dois perfis) pra 2048: com 512M o kernel mata o
+`firefox-esr` por OOM pouco depois de abrir (multiprocesso, mesmo em
+renderização por software) — `dmesg` mostra `Out of memory: Killed process
+... firefox-esr`.
 
 ## Gotchas confirmados
 

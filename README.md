@@ -152,7 +152,9 @@ ssh -i ~/.ssh/pessoal_ec1 root@172.16.0.2
 
 Clone do rootfs Debian 13, com `firefox-esr` instalado e exportado para a
 estação de trabalho local (o próprio host `taquion`) via X11 forwarding sobre
-SSH — o compositor Wayland (Sway) roda XWayland, então funciona sem VNC:
+SSH — o compositor Wayland (Sway) roda XWayland, então funciona sem VNC.
+Único perfil com `mem_size_mib` maior (2048 em vez de 512): o Firefox
+multiprocesso estoura os 512M padrão e o guest é morto por OOM.
 
 ```bash
 ssh -X -i ~/.ssh/pessoal_ec1 cferreira@172.16.2.2 firefox-esr
